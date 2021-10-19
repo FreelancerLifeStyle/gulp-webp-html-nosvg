@@ -12,7 +12,15 @@ This is a modified version of the plugin [gulp-webp-html](https://www.npmjs.com/
     <source srcset="/images/catalogImage.webp" type="image/webp">
     <img src="/images/catalogImage.jpg">
 </picture>
+
+// Input
+<img src="/images/catalogImage.svg">
+
+// Output
+<img src="/images/catalogImage.svg">
 ```
+
+
 ## Install
 ```bash
 npm i --save-dev gulp-webp-html-nosvg
