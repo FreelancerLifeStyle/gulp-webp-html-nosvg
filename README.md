@@ -27,11 +27,11 @@ npm i --save-dev gulp-webp-html-nosvg
 ```
 ## Usage
 ```javascript
-var GulpWebpHtml2 = require('gulp-webp-html-nosvg');
+let webphtml = require('gulp-webp-html-nosvg');
 
 gulp.task('html',function(){
     gulp.src('./assets/**/*.html')
-        .pipe(GulpWebpHtml2())
+        .pipe(webphtml())
         .pipe(gulp.dest('./public/'))
 });
 ```
