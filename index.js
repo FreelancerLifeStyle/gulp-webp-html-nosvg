@@ -17,13 +17,8 @@ module.exports = function (extensions) {
 		}
 		try {
 			var pictureRender = function (url, imgTag) {
-				return (
-					'<picture><source srcset="' +
-					url +
-					'" type="image/webp">' +
-					imgTag +
-					'</picture>'
-				)
+				let srcset = imgTag.indexOf('data-src') >= 0 ? "data-srcset" : "srcset";
+				return (`<picture><source ${srcset}="${url}" type="image/webp">${imgTag}</picture>`)
 			}
 			var inPicture = false
 			const data = file.contents
@@ -42,7 +37,7 @@ module.exports = function (extensions) {
 						var imgTag = regexpArray[0]
 						var newUrl = regexpArray[2]
 						// Если в урле есть .webp или .svg, пропускаем
-						if (newUrl.indexOf('.webp') + 1 || newUrl.indexOf('.svg') + 1) return line
+						if (newUrl.indexOf('.webp') + 1 || newUrl.indexOf('.svg') + 1 || newUrl.indexOf('.gif') + 1) return line
 						// Заменяем все расширения на .webp
 						for (k in extensions) {
 							newUrl = newUrl.replace(extensions[k], '.webp')
