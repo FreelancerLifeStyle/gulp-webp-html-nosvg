@@ -34,8 +34,8 @@ module.exports = function (extensions) {
 						// Новый урл с .webp
 						var Re = /<img([^>]*)src=\"(\S+)\"([^>]*)>/gi
 						var regexpArray = Re.exec(line)
-						var imgTag = regexpArray[0]
-						var newUrl = regexpArray[2]
+						var imgTag = regexpArray[0];
+						var newUrl = regexpArray[2];
 						// Если в урле есть .webp или .svg, пропускаем
 						if (newUrl.indexOf('.webp') + 1 || newUrl.indexOf('.svg') + 1 || newUrl.indexOf('.gif') + 1) return line
 						// Заменяем все расширения на .webp
@@ -52,6 +52,7 @@ module.exports = function (extensions) {
 			file.contents = new Buffer.from(data)
 			this.push(file)
 		} catch (err) {
+			console.log('!!! Убедитесь, что в названии файла картинки нет проблелов и/или кириллицы');
 			this.emit('error', new PluginError(pluginName, err))
 		}
 		cb()
