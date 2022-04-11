@@ -4,8 +4,9 @@ const through = require('through2')
 
 const pluginName = 'gulp-webp-html-nosvg'
 
-module.exports = function (extensions) {
+module.exports = function (optns) {
 	var extensions = ['.jpg', '.png', '.jpeg', '.GIF', '.gif', '.JPG', '.PNG', '.JPEG'];
+	console.log(optns);
 	return through.obj(function (file, enc, cb) {
 		if (file.isNull()) {
 			cb(null, file)
@@ -42,8 +43,12 @@ module.exports = function (extensions) {
 						for (k in extensions) {
 							newUrl = newUrl.replace(extensions[k], '.webp')
 						}
+						if (optns.dpr) {
+							newUrl = newUrl.replace('.webp', `.webp, ${newUrl.replace('.webp', `@${optns.dpr}.webp ${optns.dpr}`)}`)
+						}
 						// Компилим <picture/>
 						var newHTML = pictureRender(newUrl, imgTag)
+						console.log(`${imgTag} ----- ${newUrl}`);
 						return line.replace(imgTag, newHTML)
 					}
 					return line
