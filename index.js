@@ -1,10 +1,11 @@
 const Vinyl = require('vinyl')
 const PluginError = Vinyl.PluginError
 const through = require('through2')
+
 const pluginName = 'gulp-webp-html-nosvg'
 
-module.exports = function() {
-	const extensions = ['.jpg', '.png', '.jpeg', '.GIF', '.gif', '.JPG', '.PNG', '.JPEG']
+module.exports = function (optns = {}) {
+	var extensions = ['.jpg', '.png', '.jpeg', '.GIF', '.gif', '.JPG', '.PNG', '.JPEG'];
 	return through.obj(function (file, enc, cb) {
 		if (file.isNull()) {
 			cb(null, file)
@@ -15,72 +16,47 @@ module.exports = function() {
 			return
 		}
 		try {
-			let inPicture = false
+			var pictureRender = function (url, imgTag) {
+				let srcset = imgTag.indexOf('data-src') >= 0 ? "data-srcset" : "srcset";
+				return (`<picture><source ${srcset}="${url}" type="image/webp">${imgTag}</picture>`)
+			}
+			var inPicture = false
 			const data = file.contents
 				.toString()
 				.split('\n')
-				.map(function(line) {
+				.map(function (line) {
 					// Вне <picture/>?
 					if (line.indexOf('<picture') + 1) inPicture = true
 					if (line.indexOf('</picture') + 1) inPicture = false
+
 					// Проверяем есть ли <img/>
 					if (line.indexOf('<img') + 1 && !inPicture) {
 						// Новый урл с .webp
-						const Re = /<img([^>]*)src=\"(\S+)\"([^>]*)>/gi
-						let regexpItem,
-							regexArr = [],
-							imgTagArr = [],
-							newUrlArr = [],
-							newHTMLArr = []
-						while (regexpItem = Re.exec(line)) {
-							regexArr.push(regexpItem)
+						var Re = /<img([^>]*)src=\"(\S+)\"([^>]*)>/gi
+						var regexpArray = Re.exec(line)
+						var imgTag = regexpArray[0];
+						var newUrl = regexpArray[2];
+						// Если в урле есть .webp или .svg, пропускаем
+						if (newUrl.indexOf('.webp') + 1 || newUrl.indexOf('.svg') + 1 || newUrl.indexOf('.gif') + 1) return line
+						// Заменяем все расширения на .webp
+						for (k in extensions) {
+							newUrl = newUrl.replace(extensions[k], '.webp')
 						}
-						regexArr.forEach(item => {
-							if (item[0].includes('srcset=')) {
-								newUrlArr.push(`${item[2]}, ${getSrcUrl(item[0], 'srcset')}`)
-							} else {
-								newUrlArr.push(item[2])
-							}
-							imgTagArr.push(item[0])
-						})
-						// Если в урле есть .gif или .svg, пропускаем
-						for (let i = 0; i < newUrlArr.length; i++) {
-							if (newUrlArr[i].includes('.svg') || newUrlArr[i].includes('.gif')) {
-								newHTMLArr.push(imgTagArr[i])
-								continue
-							} else {
-								for (k of extensions) {
-									k = new RegExp(k, 'g')
-									newUrlArr[i] = newUrlArr[i].replace(k, '.webp')
-								}
-								newHTMLArr.push(pictureRender(newUrlArr[i], imgTagArr[i]))
-							}
-							line = line.replace(imgTagArr[i], newHTMLArr[i])
+						// Усли настройка dpr передана аргументом, то в разметку добавляется адрес с директивой
+						if (optns.dpr) {
+							newUrl = newUrl.replace('.webp', `.webp, ${newUrl.replace('.webp', `@${optns.dpr}.webp ${optns.dpr}`)}`)
 						}
-						return line
+						// Компилим <picture/>
+						var newHTML = pictureRender(newUrl, imgTag)
+						return line.replace(imgTag, newHTML)
 					}
 					return line
 				})
 				.join('\n')
-			function pictureRender(url, imgTag) {
-				let srcset = imgTag.indexOf('data-src') >= 0 ? "data-srcset" : "srcset";
-				return (`<picture><source ${srcset}="${url}" type="image/webp">${imgTag}</picture>`)
-			}
-			function getSrcUrl(markup, attr) {
-				let srcArr = []
-				const rexp = new RegExp(`${attr}=\"(.*?)\"`, 'i')
-				markup.split(' ').forEach((item, index, arr) => {
-					if (attr && item.includes(attr)) {
-						srcArr.push(item)
-						srcArr.push(arr[index + 1])
-					}
-				})
-				return srcArr.join(' ').match(rexp)[1]
-			}
 			file.contents = new Buffer.from(data)
 			this.push(file)
 		} catch (err) {
-			console.log('!!! Убедитесь, что в названии файла картинки нет проблелов и/или кириллицы')
+			console.log('!!! Убедитесь, что в названии файла картинки нет проблелов и/или кириллицы');
 			this.emit('error', new PluginError(pluginName, err))
 		}
 		cb()
