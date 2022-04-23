@@ -3,7 +3,7 @@ const PluginError = Vinyl.PluginError
 const through = require('through2')
 const pluginName = 'gulp-webp-html-nosvg'
 
-module.exports = function() {
+module.exports = function () {
 	const extensions = ['.jpg', '.png', '.jpeg', '.GIF', '.gif', '.JPG', '.PNG', '.JPEG']
 	return through.obj(function (file, enc, cb) {
 		if (file.isNull()) {
@@ -19,7 +19,7 @@ module.exports = function() {
 			const data = file.contents
 				.toString()
 				.split('\n')
-				.map(function(line) {
+				.map(function (line) {
 					// Вне <picture/>?
 					if (line.indexOf('<picture') + 1) inPicture = true
 					if (line.indexOf('</picture') + 1) inPicture = false
