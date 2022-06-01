@@ -57,7 +57,6 @@ module.exports = function () {
 							}
 							line = line.replace(imgTagArr[i], newHTMLArr[i])
 						}
-						console.log(line);
 						return line;
 					}
 					return line;
