@@ -70,7 +70,6 @@ module.exports = function () {
 				} else {
 					return (`<picture><source srcset="${url}" type="image/webp">${imgTag}</picture>`)
 				}
-
 			}
 			function getSrcUrl(markup, attr) {
 				let srcArr = []
