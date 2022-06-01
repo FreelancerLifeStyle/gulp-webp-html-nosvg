@@ -57,14 +57,20 @@ module.exports = function () {
 							}
 							line = line.replace(imgTagArr[i], newHTMLArr[i])
 						}
-						return line
+						console.log(line);
+						return line;
 					}
-					return line
+					return line;
 				})
 				.join('\n')
 			function pictureRender(url, imgTag) {
-				let srcset = imgTag.indexOf('data-src') >= 0 ? "data-srcset" : "srcset";
-				return (`<picture><source ${srcset}="${url}" type="image/webp">${imgTag}</picture>`)
+				if (imgTag.indexOf('data-src') > 0) {
+					imgTag = imgTag.replace('<img', '<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=" ');
+					return (`<picture><source data-srcset="${url}" srcset="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=" type="image/webp">${imgTag}</picture>`)
+				} else {
+					return (`<picture><source srcset="${url}" type="image/webp">${imgTag}</picture>`)
+				}
+
 			}
 			function getSrcUrl(markup, attr) {
 				let srcArr = []
@@ -80,7 +86,7 @@ module.exports = function () {
 			file.contents = new Buffer.from(data)
 			this.push(file)
 		} catch (err) {
-			console.log('[ERROR] Убедитесь, что в названии файла картинки нет проблелов и/или кириллицы')
+			console.log('!!! Убедитесь, что в названии файла картинки нет проблелов и/или кириллицы')
 			this.emit('error', new PluginError(pluginName, err))
 		}
 		cb()
