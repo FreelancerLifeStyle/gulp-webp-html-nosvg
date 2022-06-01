@@ -80,7 +80,7 @@ module.exports = function () {
 			file.contents = new Buffer.from(data)
 			this.push(file)
 		} catch (err) {
-			console.log('!!! Убедитесь, что в названии файла картинки нет проблелов и/или кириллицы')
+			console.log('[ERROR] Убедитесь, что в названии файла картинки нет проблелов и/или кириллицы')
 			this.emit('error', new PluginError(pluginName, err))
 		}
 		cb()
