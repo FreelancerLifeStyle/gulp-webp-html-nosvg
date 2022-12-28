@@ -4,10 +4,9 @@
 	"description": "Replaces the <img> tag with <picture> <source> <img> in HTML files. No SVG, GIF format and data- support",
 	"main": "index.js",
 	"dependencies": {
-		"gulp-util": "^3.0.8",
+		"plugin-error": "^2.0.1",
 		"through2": "^3.0.1"
 	},
-	"devDependencies": {},
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1"
 	},
